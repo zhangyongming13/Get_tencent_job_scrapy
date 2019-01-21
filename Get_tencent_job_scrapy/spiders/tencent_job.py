@@ -89,7 +89,3 @@ class Tencent_job(scrapy.Spider):
                 pass
         item['Job_requirement'] = reduce(lambda x, y: str(x) + str(y), text_Job_requirement)
         yield item
-        # zhang = []
-        # for i in data:
-        #     zhang.append(i)
-        # item['duty_work'] = reduce(lambda x,y:str(x)+str(y),zhang)
