@@ -8,12 +8,6 @@
 import scrapy
 
 
-# class GetTencentJobScrapyItem(scrapy.Item):
-#     # define the fields for your item here like:
-#     # name = scrapy.Field()
-#     pass
-
-
 class Tencentitem(scrapy.Item):
     Job_id = scrapy.Field()
     Job_name = scrapy.Field()
