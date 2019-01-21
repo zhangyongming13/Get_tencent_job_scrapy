@@ -22,3 +22,5 @@ class Tencentitem(scrapy.Item):
     number = scrapy.Field()
     place = scrapy.Field()
     pubdate = scrapy.Field()
+    duty_work = scrapy.Field()
+    Job_requirement = scrapy.Field()

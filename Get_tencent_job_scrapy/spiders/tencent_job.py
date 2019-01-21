@@ -2,6 +2,7 @@ import scrapy
 import time
 import random
 from Get_tencent_job_scrapy.items import Tencentitem
+from functools import reduce
 
 
 url = ['https://hr.tencent.com/position.php?&start=0']
@@ -40,11 +41,15 @@ class Tencent_job(scrapy.Spider):
                 item["place"] = each.xpath("./td[4]/text()").extract()[0]
                 # 发布时间
                 item["pubdate"] = each.xpath("./td[5]/text()").extract()[0]
-                yield item
+                # meta用来传递已经爬取的数据
+                response_work = scrapy.Request(item["Job_link"], meta={'item':item}, callback=self.detail_parse)
+                yield response_work
+                # yield item
         except:
             print('该页爬取不成功！')
-            time.sleep(20)
-            pass
+            recall_url = response._url
+            time.sleep(30)
+            yield scrapy.Request(recall_url, callback=self.parse)
 
         try:
             next_page = response.xpath("//a[@id='next']/@href").extract()[0]
@@ -54,7 +59,37 @@ class Tencent_job(scrapy.Spider):
                 pass
             else:
                 url = self.url_init + next_page
-                time.sleep(10 + random.randint(20, 100) / 20)
+                time.sleep(7 + random.randint(20, 100) / 20)
                 yield scrapy.Request(url, callback=self.parse)
         except:
             print('爬取结束2！')
+
+    def detail_parse(self, response_work):
+        item = response_work.meta['item']  # 接收已经爬取的数据
+        # data = response_work.css("position_detail > div > table > tbody > tr:nth-child(3)")
+        data = response_work.xpath("//tr[@class='c']")
+        # position_detail > div > table > tbody > tr:nth-child(3)
+        each_duty_work = data[0].xpath("./td/ul[@class='squareli']/li")  # 获取工作职责
+        text_duty_work = []
+        for i in each_duty_work:
+            try:  # 因为有些li没有text文本（需要的数据）所以要进行错误判断
+                work = i.xpath("./text()").extract()[0]
+                text_duty_work.append(work + u' ')
+            except:
+                pass
+        # 利用reduce对text_duty_work这个list的所有元素进行+的拼接操作
+        item['duty_work'] = reduce(lambda x, y: str(x) + str(y), text_duty_work)
+        data_Job_requirement = data[1].xpath("./td/ul[@class='squareli']/li")
+        text_Job_requirement = []
+        for i in data_Job_requirement:
+            try:
+                work = i.xpath("./text()").extract()[0]
+                text_Job_requirement.append(work + u' ')
+            except:
+                pass
+        item['Job_requirement'] = reduce(lambda x, y: str(x) + str(y), text_Job_requirement)
+        yield item
+        # zhang = []
+        # for i in data:
+        #     zhang.append(i)
+        # item['duty_work'] = reduce(lambda x,y:str(x)+str(y),zhang)

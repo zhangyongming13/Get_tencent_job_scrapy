@@ -56,7 +56,7 @@ class MongoPipeline(object):
         # Job_id = self.cursor.execute(r'select count(*) from tencent_job')
         Job_id = int(item['Job_id'])
         # python插入数据到mysql的时候，无论是什么数据类型都用%s就可以了
-        self.cursor.execute(r'insert into tencent_job values(%s,%s,%s,%s,%s,%s,%s)' ,[Job_id, item['Job_name'], item['Job_link'], item['Job_kind'], item['number'], item['place'], item['pubdate']])
+        self.cursor.execute(r'insert into tencent_job values(%s,%s,%s,%s,%s,%s,%s,%s,%s)' ,[Job_id, item['Job_name'], item['Job_link'], item['Job_kind'], item['number'], item['place'], item['pubdate'], item['duty_work'], item['Job_requirement']])
         # self.cursor.execute(r'insert into tencent_job values(Job_id, item['Job_name'], item['Job_link'], item['Job_kind'], item['number'], item['place'], item['pubdate']))'
         self.conn.commit()
         with open('tencent_job.txt', 'a', encoding='utf-8') as f:
